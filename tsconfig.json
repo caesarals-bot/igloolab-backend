@@ -1,0 +1,63 @@
+{
+	"compilerOptions": {
+		// Basic Options
+		"target": "ES2022",
+		"module": "ESNext",
+		"lib": ["ES2022"],
+		"moduleResolution": "node",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		
+		// Path Mapping
+		"baseUrl": "./src",
+		"paths": {
+			"@/*": ["./*"],
+			"@config/*": ["config/*"],
+			"@controllers/*": ["controllers/*"],
+			"@entities/*": ["entities/*"],
+			"@middlewares/*": ["middlewares/*"],
+			"@routes/*": ["routes/*"],
+			"@services/*": ["services/*"],
+			"@validators/*": ["validators/*"],
+			"@utils/*": ["utils/*"],
+			"@types/*": ["types/*"]
+		},
+		
+		// Type Checking
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"strictPropertyInitialization": false, // Required for TypeORM entities
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		
+		// Module Resolution
+		"allowJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		
+		// Experimental Features (Required for TypeORM)
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		
+		// Emit
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"removeComments": true
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"tests"
+	]
+}

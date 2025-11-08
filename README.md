@@ -27,6 +27,7 @@ Backend API REST para el sistema de gestión de inventario farmacéutico **igloo
 - [Uso](#-uso)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [API Endpoints](#-api-endpoints)
+- [Integración Frontend](#-integración-frontend)
 - [Base de Datos](#-base-de-datos)
 - [Testing](#-testing)
 - [Despliegue](#-despliegue)
@@ -42,6 +43,8 @@ Backend API REST para el sistema de gestión de inventario farmacéutico **igloo
 - 📄 **Paginación** en listados
 - 📊 **Dashboard** con estadísticas (total productos, valor inventario, productos por vencer)
 - ✅ **Validación de datos** con express-validator
+- 🌐 **CORS** configurado para integración con frontend
+- 📝 **Logging** con Morgan para debugging
 - 🐘 **PostgreSQL** con TypeORM (sincronización automática)
 - 🐳 **Docker** para desarrollo (PostgreSQL + pgAdmin)
 - 📝 **TypeScript** para mayor seguridad de tipos
@@ -467,6 +470,139 @@ Response 200:
 - `403 Forbidden` - Sin permisos
 - `404 Not Found` - Recurso no encontrado
 - `500 Internal Server Error` - Error del servidor
+
+---
+
+## 🎨 Integración Frontend
+
+### CORS Configurado
+
+El backend está configurado para aceptar peticiones desde:
+- ✅ `http://localhost:5173` (Vite - React, Vue, Svelte)
+- ✅ `http://localhost:3001` (Create React App)
+- ✅ `http://localhost:4200` (Angular)
+- ✅ Sin origin (Postman, apps móviles)
+
+### Configurar Origin Personalizado
+
+Agrega tu URL frontend en `.env`:
+```env
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,https://tudominio.com
+```
+
+### Base URL para API
+
+**Desarrollo:**
+```typescript
+const API_URL = 'http://localhost:3000/api';
+```
+
+**Producción:**
+```typescript
+const API_URL = 'https://api.igloolab.co/api';
+```
+
+### Ejemplo: Fetch con JavaScript
+
+```javascript
+// Obtener productos
+const response = await fetch('http://localhost:3000/api/products');
+const data = await response.json();
+console.log(data.products);
+
+// Crear producto
+const newProduct = await fetch('http://localhost:3000/api/products', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    nombre: 'Paracetamol 500mg',
+    precio: 15000,
+    descripcion: 'Analgésico y antipirético',
+    fechaElaboracion: '2024-01-15',
+    fechaVencimiento: '2026-01-15',
+  }),
+});
+```
+
+### Ejemplo: Axios Setup
+
+```typescript
+// api/client.ts
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Obtener productos
+export const getProducts = async (page = 1, limit = 10) => {
+  const response = await apiClient.get('/products', {
+    params: { page, limit }
+  });
+  return response.data;
+};
+
+// Obtener stats del dashboard
+export const getDashboardStats = async () => {
+  const response = await apiClient.get('/dashboard/stats');
+  return response.data.stats;
+};
+```
+
+### TypeScript Types
+
+```typescript
+export interface Product {
+  id: string;
+  nombre: string;
+  precio: number;
+  descripcion: string;
+  fechaElaboracion: string;
+  fechaVencimiento: string;
+  imagen?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardStats {
+  totalProducts: number;
+  totalInventoryValue: number;
+  averagePrice: number;
+  expiringProducts: number;
+  expiringProductsList: Array<{
+    id: string;
+    nombre: string;
+    fechaVencimiento: string;
+    daysUntilExpiry: number;
+  }>;
+}
+```
+
+### Endpoints Disponibles (Sin Auth)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/products` | Listar productos |
+| GET | `/api/products/:id` | Obtener producto |
+| POST | `/api/products` | Crear producto |
+| PUT | `/api/products/:id` | Actualizar producto |
+| DELETE | `/api/products/:id` | Eliminar producto |
+| GET | `/api/dashboard/stats` | Estadísticas generales |
+| GET | `/api/dashboard/expiry-status` | Estado de vencimientos |
+
+> **Nota:** Todos los endpoints están actualmente sin autenticación. Cuando se implemente JWT en la Fase 5, será necesario agregar el token en los headers.
+
+### Recursos Adicionales
+
+- 📄 **Ver guía completa:** `FRONTEND-INTEGRATION.md` (desarrollo)
+- 🔧 **Ejemplos con React, Vue, Angular**
+- 📝 **TypeScript types completos**
+- ✅ **Manejo de errores**
 
 ---
 

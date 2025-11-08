@@ -11,7 +11,7 @@ Backend API REST para el sistema de gestión de inventario farmacéutico **igloo
 - ✅ **Fase 1:** Configuración inicial (Completada)
 - ✅ **Fase 2:** Base de datos TypeORM (Completada)
 - ✅ **Fase 3:** CRUD de productos (Completada)
-- ⏳ **Fase 4:** Dashboard y estadísticas (Pendiente)
+- ✅ **Fase 4:** Dashboard y estadísticas (Completada)
 - ⏳ **Fase 5:** Sistema de autenticación JWT (Pendiente)
 - ⏳ **Fase 6:** Seguridad y middlewares (Pendiente)
 
@@ -40,6 +40,7 @@ Backend API REST para el sistema de gestión de inventario farmacéutico **igloo
 - 💊 **CRUD completo** de productos farmacéuticos
 - 🔍 **Búsqueda y filtros** avanzados de productos
 - 📄 **Paginación** en listados
+- 📊 **Dashboard** con estadísticas (total productos, valor inventario, productos por vencer)
 - ✅ **Validación de datos** con express-validator
 - 🐘 **PostgreSQL** con TypeORM (sincronización automática)
 - 🐳 **Docker** para desarrollo (PostgreSQL + pgAdmin)
@@ -47,7 +48,6 @@ Backend API REST para el sistema de gestión de inventario farmacéutico **igloo
 - 🏗️ **Arquitectura modular** (Controllers, Services, Validators)
 
 ### En Desarrollo ⏳
-- 📊 **Dashboard** con estadísticas en tiempo real
 - 🔐 **Autenticación JWT** con tokens de acceso y refresh
 - 👤 **Gestión de usuarios** con roles (admin, user)
 - 🛡️ **Seguridad** con helmet, CORS y rate limiting
@@ -403,10 +403,58 @@ Endpoints planeados:
 
 ---
 
-### ⏳ Dashboard (Pendiente)
+### ✅ Dashboard (Implementado)
 
-Endpoints planeados:
-- `GET /api/dashboard/stats` - Estadísticas generales
+Endpoints sin autenticación (se protegerán con JWT en fase posterior).
+
+#### Estadísticas Generales
+```http
+GET /api/dashboard/stats
+
+Response 200:
+{
+  "stats": {
+    "totalProducts": 5,
+    "totalInventoryValue": 110000,
+    "averagePrice": 22000,
+    "expiringProducts": 1,
+    "expiringProductsList": [
+      {
+        "id": "uuid",
+        "nombre": "Amoxicilina 500mg",
+        "fechaVencimiento": "2025-12-05T00:00:00.000Z",
+        "daysUntilExpiry": 25
+      }
+    ]
+  }
+}
+```
+
+**Estadísticas incluidas:**
+- `totalProducts` - Total de productos en inventario
+- `totalInventoryValue` - Suma de precios de todos los productos
+- `averagePrice` - Precio promedio
+- `expiringProducts` - Productos que vencen en 30 días
+- `expiringProductsList` - Lista ordenada de productos próximos a vencer
+
+#### Estado de Vencimientos
+```http
+GET /api/dashboard/expiry-status
+
+Response 200:
+{
+  "expiryStatus": {
+    "expired": 0,
+    "expiringSoon": 1,
+    "valid": 4
+  }
+}
+```
+
+**Grupos:**
+- `expired` - Productos ya vencidos
+- `expiringSoon` - Vencen en los próximos 30 días
+- `valid` - Vencen en más de 30 días
 
 ---
 
@@ -602,8 +650,8 @@ ISC License - Ver archivo [LICENSE](./LICENSE) para más detalles.
 ## 👨‍💻 Autor
 
 **Cesar Londoño**
-- Email: cesar@ejemplo.com
-- GitHub: [@cesar](https://github.com/cesar)
+- Email: caesarals@gmail.com
+- GitHub: [@cesar](https://github.com/caesarals-bot/igloolab-backend)
 
 ---
 

@@ -5,6 +5,7 @@ import { initializeDatabase } from './config/database';
 import { env } from './config/env';
 import homeRoute from './routes/home.route';
 import productRoutes from './routes/product.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 // Routes
 app.use('/', homeRoute);
 app.use('/api/products', productRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 /**
  * Start server

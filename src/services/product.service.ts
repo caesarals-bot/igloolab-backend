@@ -1,4 +1,4 @@
-import { Repository, Like, FindOptionsWhere } from 'typeorm';
+import { Repository, ILike, FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../config/database';
 import { Product } from '../entities/Product.entity';
 
@@ -29,10 +29,10 @@ export class ProductService {
     const sortBy = options.sortBy || 'createdAt';
     const order = options.order || 'DESC';
 
-    // Build where clause for search
+    // Build where clause for search (case-insensitive)
     const where: FindOptionsWhere<Product> = {};
     if (options.search) {
-      where.nombre = Like(`%${options.search}%`);
+      where.nombre = ILike(`%${options.search}%`);
     }
 
     // Get products with pagination
@@ -74,7 +74,7 @@ export class ProductService {
     descripcion: string;
     fechaElaboracion: string;
     fechaVencimiento: string;
-    imagen?: string;
+    imageUrl?: string;
   }): Promise<Product> {
     // Convert string dates to Date objects
     const product = this.productRepository.create({
@@ -99,7 +99,7 @@ export class ProductService {
       descripcion: string;
       fechaElaboracion: string;
       fechaVencimiento: string;
-      imagen: string;
+      imageUrl: string;
     }>
   ): Promise<Product | null> {
     // Check if product exists

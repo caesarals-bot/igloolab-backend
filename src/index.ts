@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import { initializeDatabase } from './config/database';
 import { env } from './config/env';
 import homeRoute from './routes/home.route';
+import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 
@@ -35,11 +36,13 @@ if (env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Middleware to parse JSON
-app.use(express.json());
+// Middleware to parse JSON with increased limit for Base64 images
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Routes
 app.use('/', homeRoute);
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 

@@ -30,8 +30,8 @@ export class Product {
   @Column({ type: 'timestamp', name: 'fecha_vencimiento' })
   fechaVencimiento: Date;
 
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  imagen?: string;
+  @Column({ type: 'text', nullable: true })
+  imageUrl?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

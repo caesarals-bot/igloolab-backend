@@ -52,13 +52,27 @@ export const createProductValidation = [
       return true;
     }),
 
-  body('imagen')
+  body('imageUrl')
     .optional()
     .isString()
-    .withMessage('La imagen debe ser un texto (URL)')
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage('La URL de la imagen no puede exceder 500 caracteres'),
+    .withMessage('La imagen debe ser un texto (URL o Base64)')
+    .custom((value) => {
+      // Validate Base64 or URL
+      if (value.startsWith('data:image/')) {
+        // Is Base64 - valid
+        return true;
+      } else if (value.startsWith('http://') || value.startsWith('https://')) {
+        // Is URL - validate format
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('URL de imagen inválida');
+        }
+      } else {
+        throw new Error('La imagen debe ser una URL válida o Base64 (data:image/...)');
+      }
+    }),
 ];
 
 /**
@@ -112,13 +126,27 @@ export const updateProductValidation = [
       return true;
     }),
 
-  body('imagen')
+  body('imageUrl')
     .optional()
     .isString()
-    .withMessage('La imagen debe ser un texto (URL)')
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage('La URL de la imagen no puede exceder 500 caracteres'),
+    .withMessage('La imagen debe ser un texto (URL o Base64)')
+    .custom((value) => {
+      // Validate Base64 or URL
+      if (value.startsWith('data:image/')) {
+        // Is Base64 - valid
+        return true;
+      } else if (value.startsWith('http://') || value.startsWith('https://')) {
+        // Is URL - validate format
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          throw new Error('URL de imagen inválida');
+        }
+      } else {
+        throw new Error('La imagen debe ser una URL válida o Base64 (data:image/...)');
+      }
+    }),
 ];
 
 /**

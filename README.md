@@ -93,17 +93,44 @@ JWT_REFRESH_EXPIRES_IN=7d
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 ```
 
-### 4. Crear base de datos
+### 4. Levantar PostgreSQL con Docker (Recomendado)
 
-**Opción A: Ejecutar script SQL**
+**Opción A: Usar Docker Compose (Más Fácil)**
 ```bash
+# Iniciar PostgreSQL y pgAdmin
+docker-compose up -d
+
+# Solo PostgreSQL
+docker-compose up -d postgres
+
+# Verificar que esté corriendo
+docker-compose ps
+```
+
+PostgreSQL estará disponible en:
+- **Host:** localhost
+- **Puerto:** 5433
+- **User:** postgres
+- **Password:** postgres
+- **Database:** igloolab
+
+pgAdmin (interfaz web) estará en:
+- **URL:** http://localhost:5050
+- **Email:** admin@igloolab.co
+- **Password:** admin
+
+**Opción B: PostgreSQL Local**
+
+Si prefieres instalar PostgreSQL directamente en tu máquina:
+```bash
+# Crear base de datos
+psql -U postgres -c "CREATE DATABASE igloolab;"
+
+# O ejecutar script completo
 psql -U postgres -f database/schema.sql
 ```
 
-**Opción B: Crear manualmente**
-```sql
-CREATE DATABASE igloolab;
-```
+**Nota:** Si usas Docker, el puerto es **5433**. Si usas PostgreSQL local, el puerto es **5432**.
 
 ### 5. Iniciar servidor
 ```bash
@@ -132,11 +159,116 @@ init-node/
 │   └── index.ts             # Punto de entrada
 ├── database/
 │   └── schema.sql           # Script SQL de la base de datos
+├── docker-compose.yml       # Configuración de Docker
 ├── .env.example             # Ejemplo de variables de entorno
 ├── package.json
 ├── tsconfig.json
 ├── README.md                # Este archivo
 └── TECHNICAL_DOCUMENTATION.md  # Documentación técnica completa
+```
+
+---
+
+## 🐳 Docker
+
+### Docker Compose
+
+El proyecto incluye `docker-compose.yml` que configura:
+- **PostgreSQL 16** - Base de datos principal
+- **pgAdmin 4** - Interfaz de administración web
+
+### Comandos Útiles
+
+```bash
+# Iniciar servicios
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f postgres
+
+# Detener servicios
+docker-compose down
+
+# Detener y eliminar datos (⚠️ Cuidado)
+docker-compose down -v
+
+# Ver estado de contenedores
+docker-compose ps
+
+# Acceder a PostgreSQL desde terminal
+docker exec -it igloolab_postgres psql -U postgres -d igloolab
+
+# Ejecutar script SQL en contenedor
+docker exec -i igloolab_postgres psql -U postgres -d igloolab < database/schema.sql
+```
+
+### Servicios Docker
+
+**PostgreSQL:**
+- Container: `igloolab_postgres`
+- Puerto: `5433:5432` (externo:interno)
+- Credenciales: postgres/postgres
+- Database: igloolab
+- Volumen: `postgres_data` (persistente)
+
+**pgAdmin:**
+- Container: `igloolab_pgadmin`
+- Puerto: `5050:80`
+- URL: http://localhost:5050
+- Credenciales: admin@igloolab.co / admin
+
+### Conectar a PostgreSQL
+
+**Desde tu aplicación:**
+```env
+DB_HOST=localhost
+DB_PORT=5433
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=igloolab
+```
+
+**Desde pgAdmin (http://localhost:5050):**
+1. Add New Server
+2. General → Name: IglooLab
+3. Connection:
+   - Host: `postgres` (nombre del servicio)
+   - Port: `5432` (puerto interno)
+   - Username: postgres
+   - Password: postgres
+   - Database: igloolab
+
+**Desde cliente externo (DBeaver, pgAdmin desktop, etc.):**
+- Host: localhost
+- Port: 5433
+- Username: postgres
+- Password: postgres
+- Database: igloolab
+
+### Troubleshooting Docker
+
+**Puerto 5433 ya en uso:**
+```bash
+# Cambiar puerto en docker-compose.yml
+ports:
+  - "5434:5432"  # Usar otro puerto
+```
+
+**Ver logs de errores:**
+```bash
+docker-compose logs postgres
+docker-compose logs pgadmin
+```
+
+**Reiniciar servicios:**
+```bash
+docker-compose restart postgres
+```
+
+**Limpiar y reiniciar (borra datos):**
+```bash
+docker-compose down -v
+docker-compose up -d
 ```
 
 ---
